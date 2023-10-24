@@ -6,11 +6,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	count := flag.Bool("c", false, "The number of bytes in each input file is written to the standard output.")
 	lines := flag.Bool("l", false, "The number of lines in each input file is written to the standard output.")
+	words := flag.Bool("w", false, "The number of words in each input file is written to the standard output.")
 	flag.Parse()
 
 	filename := flag.Arg(0)
@@ -23,6 +25,7 @@ func main() {
 		}
 
 		fmt.Println(len(contents))
+
 	} else if *lines {
 		contents, err := os.Open(filename)
 		if err != nil {
@@ -32,12 +35,30 @@ func main() {
 
 		scanner := bufio.NewScanner(contents)
 
-		number_of_lines := 0
+		numberOfLines := 0
 
 		for scanner.Scan() {
-			number_of_lines++
+			numberOfLines++
 		}
 
-		fmt.Println(number_of_lines)
+		fmt.Println(numberOfLines)
+	} else if *words {
+		contents, err := os.Open(filename)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		scanner := bufio.NewScanner(contents)
+
+		numberOfWords := 0
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			words := strings.Fields(line)
+			numberOfWords += len(words)
+		}
+
+		fmt.Println(numberOfWords)
 	}
 }
