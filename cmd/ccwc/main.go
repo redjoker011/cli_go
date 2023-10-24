@@ -7,12 +7,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 func main() {
 	count := flag.Bool("c", false, "The number of bytes in each input file is written to the standard output.")
 	lines := flag.Bool("l", false, "The number of lines in each input file is written to the standard output.")
 	words := flag.Bool("w", false, "The number of words in each input file is written to the standard output.")
+	characters := flag.Bool("m", false, "The number of characters in each input file is written to the standard output.")
 	flag.Parse()
 
 	filename := flag.Arg(0)
@@ -60,5 +62,13 @@ func main() {
 		}
 
 		fmt.Println(numberOfWords)
+	} else if *characters {
+		contents, err := os.ReadFile(filename)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println(utf8.RuneCount(contents))
 	}
 }
