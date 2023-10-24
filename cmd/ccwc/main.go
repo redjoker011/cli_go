@@ -20,55 +20,96 @@ func main() {
 	filename := flag.Arg(0)
 
 	if *count {
-		contents, err := os.ReadFile(filename)
+		bytes, err := readFile(filename)
+
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		fmt.Println(len(contents))
+		fmt.Println(len(bytes), filename)
 
 	} else if *lines {
-		contents, err := os.Open(filename)
+		lineCount, err := countLines(filename)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		scanner := bufio.NewScanner(contents)
-
-		numberOfLines := 0
-
-		for scanner.Scan() {
-			numberOfLines++
-		}
-
-		fmt.Println(numberOfLines)
+		fmt.Println(lineCount, filename)
 	} else if *words {
-		contents, err := os.Open(filename)
+		wordCount, err := countWords(filename)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		scanner := bufio.NewScanner(contents)
-
-		numberOfWords := 0
-
-		for scanner.Scan() {
-			line := scanner.Text()
-			words := strings.Fields(line)
-			numberOfWords += len(words)
-		}
-
-		fmt.Println(numberOfWords)
+		fmt.Println(wordCount, filename)
 	} else if *characters {
-		contents, err := os.ReadFile(filename)
+		bytes, err := readFile(filename)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		fmt.Println(utf8.RuneCount(contents))
+		fmt.Println(utf8.RuneCount(bytes), filename)
+	} else {
+		lineCount, err := countLines(filename)
+		wordCount, err := countWords(filename)
+		bytes, err := readFile(filename)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println(lineCount, wordCount, len(bytes), filename)
 	}
+}
+
+func readFile(filename string) (bytes []byte, err error) {
+	contents, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return contents, nil
+}
+
+func countLines(filename string) (count int, err error) {
+	contents, err := os.Open(filename)
+	defer contents.Close()
+
+	if err != nil {
+		return 0, err
+	}
+
+	scanner := bufio.NewScanner(contents)
+
+	numberOfLines := 0
+
+	for scanner.Scan() {
+		numberOfLines++
+	}
+	return numberOfLines, nil
+}
+
+func countWords(filename string) (count int, err error) {
+	contents, err := os.Open(filename)
+	defer contents.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	scanner := bufio.NewScanner(contents)
+
+	numberOfWords := 0
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		words := strings.Fields(line)
+		numberOfWords += len(words)
+	}
+
+	return numberOfWords, nil
 }
