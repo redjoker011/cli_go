@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -46,16 +45,11 @@ func main() {
 		lineCount := countLines(input)
 		bytes := countRune(input)
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
 		fmt.Println(lineCount, wordCount, bytes, filename)
 	}
 }
 
-func countBytes(input io.Reader) (count int) {
+func countBytes(input *os.File) (count int) {
 	scanner := bufio.NewScanner(input)
 	scanner.Split(bufio.ScanBytes)
 
@@ -68,7 +62,7 @@ func countBytes(input io.Reader) (count int) {
 	return
 }
 
-func countRune(input io.Reader) (count int) {
+func countRune(input *os.File) (count int) {
 	scanner := bufio.NewScanner(input)
 	scanner.Split(bufio.ScanRunes)
 
@@ -81,7 +75,7 @@ func countRune(input io.Reader) (count int) {
 	return
 }
 
-func countLines(input io.Reader) (count int) {
+func countLines(input *os.File) (count int) {
 	scanner := bufio.NewScanner(input)
 
 	count = 0
@@ -94,7 +88,7 @@ func countLines(input io.Reader) (count int) {
 	return
 }
 
-func countWords(input io.Reader) (count int) {
+func countWords(input *os.File) (count int) {
 	scanner := bufio.NewScanner(input)
 
 	numberOfWords := 0
@@ -108,7 +102,7 @@ func countWords(input io.Reader) (count int) {
 	return numberOfWords
 }
 
-func getInput(filename string) (fileContent io.Reader, err error) {
+func getInput(filename string) (fileContent *os.File, err error) {
 	input := os.Stdin
 	fi, err := input.Stat()
 
